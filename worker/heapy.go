@@ -68,13 +68,17 @@ func (b Balancer) Dispatch() {
 // Print logs # of pending tasks for each workers.
 func (b Balancer) Print() {
 	var buffer bytes.Buffer
+
+	var sum int
 	for _, worker := range b.pool {
 		buffer.WriteString(fmt.Sprintf("%3d", worker.pending))
+		sum += worker.pending
 	}
-	fmt.Println(buffer.String())
+	avg := float64(sum) / float64(nWorker)
+	fmt.Printf("%s   %.2f\n", buffer.String(), avg)
 }
 
-// simulateCompletion naively simulates job requests for each worker
+// simDispatch naively simulates job requests for each worker
 func (b Balancer) simDispatch() {
 	for i := 0; i < nRequest; i++ {
 		b.Dispatch()
@@ -82,7 +86,7 @@ func (b Balancer) simDispatch() {
 	}
 }
 
-// simulateCompletion naively simulates job completion(all) for each worker
+// simCompletion naively simulates job completion(all) for each worker
 func (b Balancer) simCompletion() {
 
 	for empty := nWorker; empty > 0; {
