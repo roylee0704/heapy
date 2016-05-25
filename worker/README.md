@@ -6,6 +6,7 @@ All goes the same as generic `item/heapy.go`, except for `update()`.
 ## Run
 
 ```sh
+
 -r int
       number of requests (default 100)
 -w int
