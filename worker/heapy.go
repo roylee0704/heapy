@@ -5,6 +5,7 @@ import (
 	"container/heap"
 	"flag"
 	"fmt"
+	"time"
 )
 
 var (
@@ -22,11 +23,8 @@ func main() {
 	flag.Parse()
 	b := NewBalancer(nWorker)
 
-	for i := 0; i < nRequest; i++ {
-
-		b.Dispatch()
-		b.Print()
-	}
+	b.simDispatch()
+	b.simCompletion()
 
 }
 
@@ -53,6 +51,13 @@ func genWorker(n int) Pool {
 	return p
 }
 
+// Complete allows worker to report for job completion.
+func (b Balancer) Complete(w *Worker) {
+	heap.Remove(&b.pool, w.i)
+	w.pending--
+	heap.Push(&b.pool, w)
+}
+
 // Dispatch distributes job to most ligthly loaded worker.
 func (b Balancer) Dispatch() {
 	w := heap.Pop(&b.pool).(*Worker)
@@ -67,6 +72,31 @@ func (b Balancer) Print() {
 		buffer.WriteString(fmt.Sprintf("%3d", worker.pending))
 	}
 	fmt.Println(buffer.String())
+}
+
+// simulateCompletion naively simulates job requests for each worker
+func (b Balancer) simDispatch() {
+	for i := 0; i < nRequest; i++ {
+		b.Dispatch()
+		b.Print()
+	}
+}
+
+// simulateCompletion naively simulates job completion(all) for each worker
+func (b Balancer) simCompletion() {
+
+	for empty := nWorker; empty > 0; {
+		for _, w := range b.pool {
+			time.Sleep(100 * time.Millisecond) // 1 second
+			if w.pending > 0 {
+				b.Complete(w)
+				b.Print()
+				continue
+			}
+			empty--
+		}
+	}
+
 }
 
 // Worker is something we manage in a pending queue
