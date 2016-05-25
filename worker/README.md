@@ -3,7 +3,7 @@
 All goes the same as generic `item/heapy.go`, except for `update()`.
 
 
-## Run hrllo wotl
+## Run
 
 ```sh
 
