@@ -49,6 +49,15 @@ func genWorker(n int) Pool {
 	return p
 }
 
+// Print logs # of pending tasks for each workers.
+func (b Balancer) Print() {
+	var buffer bytes.Buffer
+	for _, worker := range b.pool {
+		buffer.WriteString(fmt.Sprintf("%2d", worker.pending))
+	}
+	fmt.Println(buffer.String())
+}
+
 // Worker is something we manage in a pending queue
 type Worker struct {
 	i       int // index is needed by update
@@ -88,14 +97,4 @@ func (p *Pool) Pop() interface{} {
 	w := a[len(a)-1]
 	w.i = -1 // for safety
 	return w
-}
-
-func (b Balancer) Print() {
-	var buffer bytes.Buffer
-
-	for _, worker := range b.pool {
-		//fmt.Printf("%+v %d\n", worker, i)
-		buffer.WriteString(fmt.Sprintf("[%d]:%d = %s  ,", worker.i, worker.pending, worker.name))
-	}
-	fmt.Println(buffer.String())
 }
