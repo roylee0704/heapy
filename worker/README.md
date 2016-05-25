@@ -3,8 +3,14 @@
 All goes the same as generic `item/heapy.go`, except for `update()`.
 
 
-# Run
+## Run
 
 ```sh
-$ go run heapy.go -n=10
+-r int
+      number of requests (default 100)
+-w int
+      number of workers (default 5)
+
+
+$ go run heapy.go -w=10 -r=1000
 ```
