@@ -8,19 +8,23 @@ import (
 )
 
 var (
-	nWorkers = flag.Int("n", 5, "number of workers")
+	nWorker  int
+	nRequest int
 )
+
+func init() {
+	flag.IntVar(&nWorker, "w", 5, "number of workers")
+	flag.IntVar(&nRequest, "r", 100, "number of requests")
+}
 
 func main() {
 
 	flag.Parse()
-	b := NewBalancer(*nWorkers)
+	b := NewBalancer(nWorker)
 
-	for i := 0; i < 10; i++ {
-		w := heap.Pop(&b.pool).(*Worker)
-		w.pending++
-		heap.Push(&b.pool, w)
+	for i := 0; i < nRequest; i++ {
 
+		b.Dispatch()
 		b.Print()
 	}
 
@@ -49,11 +53,18 @@ func genWorker(n int) Pool {
 	return p
 }
 
+// Dispatch distributes job to most ligthly loaded worker.
+func (b Balancer) Dispatch() {
+	w := heap.Pop(&b.pool).(*Worker)
+	w.pending++
+	heap.Push(&b.pool, w)
+}
+
 // Print logs # of pending tasks for each workers.
 func (b Balancer) Print() {
 	var buffer bytes.Buffer
 	for _, worker := range b.pool {
-		buffer.WriteString(fmt.Sprintf("%2d", worker.pending))
+		buffer.WriteString(fmt.Sprintf("%3d", worker.pending))
 	}
 	fmt.Println(buffer.String())
 }
