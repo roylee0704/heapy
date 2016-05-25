@@ -69,13 +69,18 @@ func (b Balancer) Dispatch() {
 func (b Balancer) Print() {
 	var buffer bytes.Buffer
 
-	var sum int
+	sum := 0
+	sumq := 0
 	for _, worker := range b.pool {
 		buffer.WriteString(fmt.Sprintf("%3d", worker.pending))
 		sum += worker.pending
+		sumq += worker.pending * worker.pending
+
 	}
 	avg := float64(sum) / float64(nWorker)
-	fmt.Printf("%s   %.2f\n", buffer.String(), avg)
+	variance := float64(sumq)/float64(nWorker) - avg*avg
+
+	fmt.Printf("%s   %.2f %.2f\n", buffer.String(), avg, variance)
 }
 
 // simDispatch naively simulates job requests for each worker
