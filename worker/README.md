@@ -15,3 +15,5 @@ All goes the same as generic `item/heapy.go`, except for `update()`.
 
 $ go run heapy.go -w=10 -r=1000
 ```
+
+[![asciicast](https://asciinema.org/a/46807.png)](https://asciinema.org/a/46807)
